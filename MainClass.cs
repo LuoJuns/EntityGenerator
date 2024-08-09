@@ -9,7 +9,7 @@ namespace EntityGenerator
     {
         public void GeneratorDBModel()
         {
-            string connectionString = "server=139.9.219.213;port=3306;database=mall;user=root_lj;password=lj_dev";
+            string connectionString = "server=127.0.0.1;port=3306;database=YourDatabase;user=your_username;password=your_password";
             var db = new SqlSugarClient(new ConnectionConfig
             {
                 ConnectionString = connectionString,
