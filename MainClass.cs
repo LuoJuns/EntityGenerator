@@ -5,20 +5,10 @@ namespace EntityGenerator
 {
 
 
-    public class MainClass
+    public class MainClass(ISqlSugarClient db)
     {
         public void GeneratorDBModel()
         {
-            string connectionString = "Server=myServerAddress;Database=myDatabase;User Id=myUsername;Password=myPassword;";
-            //string connectionString = "server=127.0.0.1;port=3306;database=YourDatabase;user=your_username;password=your_password";
-            var db = new SqlSugarClient(new ConnectionConfig
-            {
-                ConnectionString = connectionString,
-                DbType = DbType.MySql,
-                IsAutoCloseConnection = true,
-                InitKeyType = InitKeyType.Attribute
-            });
-
             var tableInfoList = db.DbMaintenance.GetTableInfoList();
             var entityGenerator = new EntityGenerator
             {
@@ -30,6 +20,25 @@ namespace EntityGenerator
             {
                 entityGenerator.GenerateEntity(db, tableInfo);
             }
+
+            Console.WriteLine("Entity classes generated.");
+        }
+
+        /// <summary>
+        /// 根据表明生成实体类
+        /// </summary>
+        /// <param name="tableName"></param>
+        public void GeneratorDBModel(string tableName)
+        {
+            var tableInfo = db.DbMaintenance.GetTableInfoList().Where(t => t.Name.ToLower() == tableName.ToLower()).FirstOrDefault();
+            var entityGenerator = new EntityGenerator
+            {
+                OutputPath = "Models",
+                Namespace = "EntityGenerator"
+            };
+
+            if (tableInfo != null)
+                entityGenerator.GenerateEntity(db, tableInfo);
 
             Console.WriteLine("Entity classes generated.");
         }

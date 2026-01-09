@@ -1,3 +1,4 @@
+using EntityGenerator;
 using SqlSugar;
 using System.Configuration;
 
@@ -9,14 +10,14 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddScoped<SqlSugarClient>(provider =>
+builder.Services.AddScoped<MainClass>();
+builder.Services.AddScoped<ISqlSugarClient>(provider =>
 {
     return new SqlSugarClient(new ConnectionConfig()
     {
-        ConnectionString =builder.Configuration.GetConnectionString("DefaultConnection"),
-        DbType = DbType.MySql, // 设置数据库类型为 MySQL
-        IsAutoCloseConnection = true, // 自动关闭连接
-        InitKeyType = InitKeyType.Attribute // 初始化主键和自增列信息的方式
+        ConnectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new Exception("Connection string not found"),
+        DbType = (DbType)Enum.Parse(typeof(DbType), builder.Configuration.GetConnectionString("DefaultDbType") ?? throw new Exception("Database type not found")),
+        IsAutoCloseConnection = true // 自动关闭连接
     });
 });
 var app = builder.Build();
