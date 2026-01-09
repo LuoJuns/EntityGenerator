@@ -11,8 +11,8 @@ namespace EntityGenerator
     {
         public string OutputPath { get; set; }
         public string Namespace { get; set; }
-        public string[] Prefixes { get; set; } = { "pms_", "cms_","ums_","sms_","oms_" }; // 预定义的前缀列表
-        public void GenerateEntities(SqlSugarClient db)
+        public string[] Prefixes { get; set; } = { "pms_", "cms_", "ums_", "sms_", "oms_" }; // 预定义的前缀列表
+        public void GenerateEntities(ISqlSugarClient db)
         {
             var tableInfoList = db.DbMaintenance.GetTableInfoList();
 
@@ -22,7 +22,7 @@ namespace EntityGenerator
             }
         }
 
-        public void GenerateEntity(SqlSugarClient db, DbTableInfo tableInfo)
+        public void GenerateEntity(ISqlSugarClient db, DbTableInfo tableInfo)
         {
             var className = ToPascalCase(RemovePrefixes(tableInfo.Name)); // 更新为正确的属性
             var columns = db.DbMaintenance.GetColumnInfosByTableName(tableInfo.Name);
@@ -43,7 +43,7 @@ namespace EntityGenerator
                 var nullable = column.IsNullable ? "?" : "";
                 var type = MapSqlTypeToCSharp(column.DataType);
                 string commentStr = FormatComment(column.ColumnDescription);
-                if(commentStr != "")
+                if (commentStr != "")
                 {
                     sb.Append($"        {commentStr}");
                 }
@@ -77,7 +77,10 @@ namespace EntityGenerator
                 "float" => "float",
                 "double" => "double",
                 "bit" => "bool",
-                _ => "object"
+                "String" => "string",
+                "Decimal" => "decimal",
+                "DateTime" => "DateTime",
+                _ => "string"  // Default to string for unknown types
             };
         }
         private string ToPascalCase(string input)
@@ -105,11 +108,11 @@ namespace EntityGenerator
                 return "";
             }
 
-         
+
             var lines = comment.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
             var formattedComment = new StringBuilder();
 
-          
+
             formattedComment.AppendLine("/// <summary>");
             foreach (var line in lines)
             {

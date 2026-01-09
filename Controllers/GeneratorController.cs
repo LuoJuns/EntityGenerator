@@ -5,27 +5,19 @@ namespace EntityGenerator.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class GeneratorController : ControllerBase
+    public class GeneratorController(MainClass mainClass, ILogger<GeneratorController> logger) : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
-
-        private readonly ILogger<GeneratorController> _logger;
-        private readonly SqlSugarClient _sqlSugarClient;
-
-        public GeneratorController(ILogger<GeneratorController> logger, SqlSugarClient sqlSugarClient)
-        {
-            _logger = logger;
-            _sqlSugarClient = sqlSugarClient;
-        }
-
         [HttpGet("StartGenerator")]
         public IActionResult StartGenerator()
         {
-            MainClass o = new MainClass();
-            o.GeneratorDBModel();
+            mainClass.GeneratorDBModel();
+            return Ok("Success!");
+        }
+
+        [HttpGet("[action]")]
+        public IActionResult GeneratorFromTableName(string tableName)
+        {
+            mainClass.GeneratorDBModel(tableName);
             return Ok("Success!");
         }
     }
